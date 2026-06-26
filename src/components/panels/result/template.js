@@ -1,5 +1,5 @@
 export const template = /* HTML */ `
-  <section id="result" class="panel" hidden aria-live="polite">
+  <section id="result" class="panel" aria-live="polite">
     <p id="location"></p>
     <result-hero></result-hero>
     <p id="sigma"></p>

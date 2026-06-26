@@ -1,21 +1,18 @@
 const state = {
-  /** @type {string | null} */
+  status: "idle",
   selectedLocation: null,
-
-  /** @type {WeatherData | null} */ //TODO: fix type
+  analysis: null,
+  error: null,
   cachedHistoricalData: null,
 };
 
 const listeners = new Set();
 
 /**
- * Returns the state of the given key
- *
- * @param {keyof state} key
- * @returns State of the given key
+ * Returns the current state
  */
-export function getState(key) {
-  return state[key];
+export function getState() {
+  return state;
 }
 
 /**

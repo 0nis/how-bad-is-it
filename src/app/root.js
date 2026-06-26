@@ -1,6 +1,7 @@
 import "../components/header/index.js";
 import "../components/search/input/index.js";
 import "../components/search/suggestions/index.js";
+import "../components/panels/container.js";
 import { resetSheet } from "../styles/reset.js";
 
 class AppRoot extends HTMLElement {
@@ -17,6 +18,7 @@ class AppRoot extends HTMLElement {
     this.innerHTML = /* HTML */ `
       <site-header></site-header>
       <site-search></site-search>
+      <panel-container></panel-container>
     `;
   }
 }

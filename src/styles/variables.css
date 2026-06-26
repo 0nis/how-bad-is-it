@@ -20,4 +20,20 @@
   --r-sm: 6px;
   --r-md: 10px;
   --r-lg: 16px;
+
+  /* Gauge fills */
+  --gauge-normal: #52c08a;
+  --gauge-mild: #a8c452;
+  --gauge-moderate: #e8c038;
+  --gauge-warm: #e89838;
+  --gauge-extreme: #e86038;
+  --gauge-critical: #e83060;
+
+  /* Severity text colours */
+  --sev-0: #52c08a;
+  --sev-1: #a8c452;
+  --sev-2: #e8c038;
+  --sev-3: #e89838;
+  --sev-4: #e86038;
+  --sev-5: #e83060;
 }

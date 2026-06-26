@@ -1,4 +1,5 @@
 import { searchLocations } from "../../../api/locations.js";
+import { runAnalysis } from "../../../app/analysis.js";
 import { setState, subscribe } from "../../../app/store.js";
 import { resetSheet } from "../../../styles/reset.js";
 import { el } from "../../../utils/dom.js";
@@ -59,13 +60,14 @@ class Search extends HTMLElement {
   selectLocation(loc) {
     setState({ selectedLocation: loc });
 
-    this.dispatchEvent(
-      new CustomEvent("location-selected", {
-        detail: loc,
-        bubbles: true,
-        composed: true,
-      }),
-    );
+    // this.dispatchEvent(
+    //   new CustomEvent("location-selected", {
+    //     detail: loc,
+    //     bubbles: true,
+    //     composed: true,
+    //   }),
+    // );
+    runAnalysis(loc);
   }
 
   render() {

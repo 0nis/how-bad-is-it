@@ -8,7 +8,7 @@ export const style = /* CSS */ `
         padding: 1.5rem 0 1rem;
     }
 
-    .pct-value {
+    #pct-value {
         font-family: var(--font-mono);
         font-size: clamp(3.5rem, 14vw, 6rem);
         font-weight: 700;
@@ -36,19 +36,19 @@ export const style = /* CSS */ `
         color: var(--sev-5);
     }
 
-    .pct-descriptor {
+    #pct-descriptor {
         font-size: 0.9rem;
         color: var(--text-secondary);
     }
 
-    .temp-descriptor {
+    #temp-descriptor {
         font-size: 1.1rem;
         font-weight: 600;
         color: var(--text-primary);
         margin-top: 0.25rem;
     }
 
-    .frequency {
+    #frequency {
         font-size: 0.875rem;
         color: var(--text-secondary);
         font-style: italic;
