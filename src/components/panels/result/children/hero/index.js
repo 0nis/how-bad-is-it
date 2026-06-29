@@ -30,9 +30,11 @@ class ResultHero extends HTMLElement {
     );
   }
 
-  getDescription(isHot, percentile, location) {
-    const pctForPhrase = isHot ? percentile : 100 - percentile;
-    return `${isHot ? "hotter" : "colder"} than ${pctForPhrase.toFixed(pctForPhrase >= 99 ? 1 : 0)}% of days like this in ${location}`;
+  getDescription(sigma, pct, loc) {
+    if (sigma > 0)
+      return `Hotter than ${pct.toFixed(pct >= 99 ? 1 : 0)}% of days like this in ${loc}`;
+    else
+      return `Colder than ${pct.toFixed(pct <= 1 ? 1 : 0)}% of days like this in ${loc}`;
   }
 }
 
