@@ -3,7 +3,7 @@ export const ARCHIVE_BASE = "https://archive-api.open-meteo.com/v1";
 export const FORECAST_BASE = "https://api.open-meteo.com/v1";
 
 /** The number of years of historical data to fetch */
-export const HISTORICAL_YEARS = 1; // TODO temp, switch back to 30 after testing
+export const HISTORICAL_YEARS = 30;
 
 /** The number of days around the target date to compare */
 export const WINDOW_DAYS = 7;
