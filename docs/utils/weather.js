@@ -32,8 +32,8 @@ export function formatPrecipitation(value, unitSystem = "metric") {
  */
 export function formatWind(value, unitSystem = "metric") {
   if (unitSystem === "imperial")
-    return `${kmhToMph(Number(value)).toFixed(1)} mph.`;
-  return `${Number(value).toFixed(1)} km/h.`;
+    return `${kmhToMph(Number(value)).toFixed(1)} mph`;
+  return `${Number(value).toFixed(1)} km/h`;
 }
 
 /**

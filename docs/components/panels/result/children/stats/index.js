@@ -44,7 +44,7 @@ class ResultStats extends HTMLElement {
 
       wind: {
         row: "#wind",
-        id: "wind",
+        id: "windSpeed",
         format: (v, unitSystem) => formatWind(v, unitSystem),
       },
 
@@ -81,8 +81,8 @@ class ResultStats extends HTMLElement {
         continue;
       }
 
-      const fmt = () => {
-        return m.format(observed, unitSystem);
+      const fmt = (v) => {
+        return m.format(v, unitSystem);
       };
 
       row.querySelector("[data-now]").textContent = fmt(observed);

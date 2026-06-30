@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS = {
   historicalYears: 30,
 
   /** The number of days around the target date to compare */
-  windowDays: 15,
+  windowDays: 7,
 
   /** The number of hours around the target hour to compare */
   windowHours: 2,
