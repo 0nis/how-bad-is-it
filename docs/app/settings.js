@@ -22,6 +22,7 @@ export const SETTINGS_BOUNDS = {
   historicalYears: { min: 1, max: 50, step: 1 },
   windowDays: { min: 1, max: 30, step: 1 },
   windowHours: { min: 0, max: 6, step: 1 },
+  minReadings: { min: 1, max: 100, step: 1 },
 };
 
 let currentSettings = loadSettings();

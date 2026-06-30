@@ -104,10 +104,12 @@ class SiteSettings extends HTMLElement {
     );
     this.applyBounds("setting-window-days", SETTINGS_BOUNDS.windowDays);
     this.applyBounds("setting-window-hours", SETTINGS_BOUNDS.windowHours);
+    this.applyBounds("setting-min-readings", SETTINGS_BOUNDS.minReadings);
 
     this.bindSlider("setting-historical-years", "historicalYears", "yr");
-    this.bindSlider("setting-window-days", "windowDays", "day");
-    this.bindSlider("setting-window-hours", "windowHours", "hr");
+    this.bindSlider("setting-window-days", "windowDays", "day", "±");
+    this.bindSlider("setting-window-hours", "windowHours", "hr", "±");
+    this.bindSlider("setting-min-readings", "minReadings");
   }
 
   renderSliders(settings) {
@@ -116,18 +118,24 @@ class SiteSettings extends HTMLElement {
       settings.historicalYears,
       "yr",
     );
-    this.setSliderValue("setting-window-days", settings.windowDays, "day");
-    this.setSliderValue("setting-window-hours", settings.windowHours, "hr");
+    this.setSliderValue("setting-window-days", settings.windowDays, "day", "±");
+    this.setSliderValue(
+      "setting-window-hours",
+      settings.windowHours,
+      "hr",
+      "±",
+    );
+    this.setSliderValue("setting-min-readings", settings.minReadings);
   }
 
-  bindSlider(id, settingKey, unitLabel) {
+  bindSlider(id, settingKey, unitLabel, prefix) {
     const slider = this.shadowRoot.querySelector(`#${id}`);
     const output = this.shadowRoot.querySelector(`#${id}-value`);
     if (!slider) return;
 
     slider.addEventListener("input", () => {
       if (output)
-        output.textContent = this.formatValue(slider.value, unitLabel);
+        output.textContent = this.formatValue(slider.value, unitLabel, prefix);
     });
     slider.addEventListener("change", () => {
       updateSettings({ [settingKey]: Number(slider.value) });
@@ -142,17 +150,17 @@ class SiteSettings extends HTMLElement {
     el.step = step;
   }
 
-  setSliderValue(id, value, unitLabel) {
+  setSliderValue(id, value, unitLabel, prefix) {
     const slider = this.shadowRoot.querySelector(`#${id}`);
     const output = this.shadowRoot.querySelector(`#${id}-value`);
     if (slider) slider.value = value;
-    if (output) output.textContent = this.formatValue(value, unitLabel);
+    if (output) output.textContent = this.formatValue(value, unitLabel, prefix);
   }
 
-  formatValue(value, unitLabel) {
+  formatValue(value, unitLabel, prefix) {
     const n = Number(value);
-    const plural = n === 1 ? "" : "s";
-    return `±${n} ${unitLabel}${plural}`;
+    const plural = n === 1 || !unitLabel ? "" : "s";
+    return `${prefix ?? ""}${n} ${unitLabel ?? ""}${plural}`;
   }
 }
 

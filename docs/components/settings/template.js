@@ -70,7 +70,7 @@ export const template = /* HTML */ `
         >
       </div>
       <input type="range" id="setting-window-days" class="slider" />
-      <p class="hint">Days around today's date to include, each year.</p>
+      <p class="hint">Days around the selected date to include, each year.</p>
     </div>
 
     <div class="section">
@@ -83,7 +83,22 @@ export const template = /* HTML */ `
         >
       </div>
       <input type="range" id="setting-window-hours" class="slider" />
-      <p class="hint">Hours around the current time to include.</p>
+      <p class="hint">Hours around the selected time to include.</p>
+    </div>
+
+    <div class="section">
+      <div class="slider-row">
+        <label for="setting-min-readings" class="section-label">
+          Minimum readings
+        </label>
+        <span id="setting-min-readings-value" class="slider-value"
+          >±${DEFAULT_SETTINGS.minReadings}</span
+        >
+      </div>
+      <input type="range" id="setting-min-readings" class="slider" />
+      <p class="hint">
+        Minimum number of historical readings needed for analysis.
+      </p>
     </div>
   </aside>
 `;
