@@ -8,6 +8,7 @@ const state = {
   analysis: null,
   error: null,
   settingsOpen: false,
+  mode: "current",
 };
 
 const listeners = new Set();

@@ -1,8 +1,3 @@
-import {
-  HISTORICAL_YEARS,
-  WINDOW_DAYS,
-  WINDOW_HOURS,
-} from "../../constants.js";
 import { globalSheet } from "../../styles/sheets/global.js";
 import { renderShadow } from "../../utils/shadow.js";
 import { style } from "./style.js";

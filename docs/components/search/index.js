@@ -1,9 +1,11 @@
-import { searchLocations } from "../../../api/locations.js";
-import { runAnalysisForCurrentConditions } from "../../../core/analysis.js";
-import { setState, subscribe } from "../../../app/store.js";
-import { globalSheet } from "../../../styles/sheets/global.js";
-import { el } from "../../../utils/dom.js";
-import { renderShadow } from "../../../utils/shadow.js";
+import "./suggestions/index.js";
+
+import { searchLocations } from "../../api/locations.js";
+import { runAnalysisForCurrentConditions } from "../../core/analysis.js";
+import { setState, subscribe } from "../../app/store.js";
+import { globalSheet } from "../../styles/sheets/global.js";
+import { el } from "../../utils/dom.js";
+import { renderShadow } from "../../utils/shadow.js";
 import { style } from "./style.js";
 import { template } from "./template.js";
 

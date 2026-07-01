@@ -37,4 +37,10 @@ export const style = /* CSS */ `
     #input::placeholder {
         color: var(--text-tertiary);
     }
+
+    @media (prefers-reduced-motion: reduce) {
+        .field {
+            transition: none;
+        }
+    }
 `;

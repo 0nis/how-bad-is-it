@@ -19,10 +19,23 @@ globalSheet.replaceSync(/* CSS */ `
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem 1rem;
+    padding: 1rem;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
 
   [hidden] {
     display: none !important;

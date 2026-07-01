@@ -29,6 +29,7 @@
  * - windSpeed: km/h
  * - precipitation: mm
  * - cloud cover: %
+ * @property {"current" | "manual"} mode
  */
 
 /** @type {AppState} */
