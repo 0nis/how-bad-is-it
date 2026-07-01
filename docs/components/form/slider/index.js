@@ -4,7 +4,7 @@ import { template } from "./template.js";
 import { style } from "./style.js";
 import { pluralize } from "../../../utils/string.js";
 
-class CustomSlider extends HTMLElement {
+class SliderInput extends HTMLElement {
   static observedAttributes = [
     "id",
     "value",
@@ -85,4 +85,4 @@ class CustomSlider extends HTMLElement {
   }
 }
 
-customElements.define("custom-slider", CustomSlider);
+customElements.define("slider-input", SliderInput);

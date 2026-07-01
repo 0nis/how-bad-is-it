@@ -43,50 +43,50 @@ export const template = /* HTML */ `
     </div>
 
     <div class="section">
-      <custom-slider id="setting-historical-years" unit="yr">
+      <slider-input id="setting-historical-years" unit="yr">
         <label
           slot="label"
           class="section-label"
           for="setting-historical-years-input"
           >Historical years</label
         >
-      </custom-slider>
+      </slider-input>
       <p class="hint">How far back to pull comparison data from.</p>
     </div>
 
     <div class="section">
-      <custom-slider id="setting-window-days" unit="day" prefix="±">
+      <slider-input id="setting-window-days" unit="day" prefix="±">
         <label
           slot="label"
           class="section-label"
           for="setting-window-days-input"
           >Day window</label
         >
-      </custom-slider>
+      </slider-input>
       <p class="hint">Days around the selected date to include, each year.</p>
     </div>
 
     <div class="section">
-      <custom-slider id="setting-window-hours" unit="hr" prefix="±">
+      <slider-input id="setting-window-hours" unit="hr" prefix="±">
         <label
           slot="label"
           class="section-label"
           for="setting-window-hours-input"
           >Hour window</label
         >
-      </custom-slider>
+      </slider-input>
       <p class="hint">Hours around the selected time to include.</p>
     </div>
 
     <div class="section">
-      <custom-slider id="setting-min-readings">
+      <slider-input id="setting-min-readings">
         <label
           slot="label"
           class="section-label"
           for="setting-min-readings-input"
           >Minimum readings</label
         >
-      </custom-slider>
+      </slider-input>
       <p class="hint">
         Minimum number of historical readings needed for analysis.
       </p>
