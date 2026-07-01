@@ -15,7 +15,7 @@ class ModePastPanel extends HTMLElement {
   }
 
   connectedCallback() {
-    renderShadow(this.shadowRoot, template);
+    this.init();
 
     this.unsubscribe = subscribe(
       (state) => state.mode,
@@ -33,6 +33,21 @@ class ModePastPanel extends HTMLElement {
   disconnectedCallback() {
     this.unsubscribe?.();
     this.unsubscribeSettings?.();
+  }
+
+  init() {
+    this.render();
+
+    const typeInput = this.shadowRoot.querySelector("#type");
+    typeInput.options = [
+      { label: "Max", value: "max" },
+      { label: "Min", value: "min" },
+    ];
+    typeInput.value = "max";
+  }
+
+  render() {
+    renderShadow(this.shadowRoot, template);
   }
 }
 

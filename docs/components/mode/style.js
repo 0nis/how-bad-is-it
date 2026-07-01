@@ -64,21 +64,30 @@ modeSheet.replaceSync(/* CSS */ `
         padding: 0.5rem 0.65rem;
         font-family: var(--font-mono);
         font-size: 0.9rem;
-        color: var(--text-primary);
+        color: var(--text-secondary);
         outline: none;
         transition:
             border-color 0.15s,
-            box-shadow 0.15s;
+            box-shadow 0.15s,
+            color 0.15s;
         width: 100%;
         -webkit-appearance: none;
         color-scheme: dark;
     }
+    input:hover {
+        color: var(--text-primary);
+    }
     input:focus {
+        color: var(--text-primary);
         border-color: var(--accent-dim);
         box-shadow: 0 0 0 3px var(--accent-glow);
     }
     input::placeholder {
         color: var(--text-tertiary);
+    }
+
+    input[type="date"] {
+        cursor: pointer;
     }
 
     input[type="number"]::-webkit-inner-spin-button,

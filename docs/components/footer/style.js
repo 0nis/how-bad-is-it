@@ -20,13 +20,32 @@ export const style = /* CSS */ `
         color: var(--text-tertiary);
         display: inline-flex;
         justify-content: center;
-        gap: 0.35rem;
+        align-items: center;
+        gap: 0.4rem;
+        font-style: italic;
     }
     footer .support a:hover {
         color: var(--accent);
     }
-    footer .support img {
+    footer .support svg {
         width: 16px;
         height: 16px;
+        transform: rotate(8deg)
+    }
+
+    footer .support a:hover svg {
+        animation: rotate 2s infinite linear;
+    }
+
+    @keyframes rotate {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        footer .support a:hover svg {
+            animation: none;
+        }
     }
 `;

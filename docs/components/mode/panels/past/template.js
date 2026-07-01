@@ -7,6 +7,10 @@ export const template = /* HTML */ `
         <label for="date" class="label">Date</label>
         <input id="date" type="date" />
       </div>
+      <div class="field">
+        <label for="type" class="label">Type</label>
+        <segmented-input id="type"></segmented-input>
+      </div>
     </div>
     <div class="actions">
       <p class="description">

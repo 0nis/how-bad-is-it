@@ -4,7 +4,6 @@ export const style = /* CSS */ `
         background: var(--bg-2);
         border: 1px solid var(--border);
         border-radius: var(--r-md);
-        padding: 0.25rem;
         gap: 0.25rem;
     }
     
