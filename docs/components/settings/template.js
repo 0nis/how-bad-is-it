@@ -20,26 +20,7 @@ export const template = /* HTML */ `
 
     <div class="section">
       <label class="section-label">Units</label>
-      <div class="segmented-control">
-        <label class="segmented-option">
-          <input
-            type="radio"
-            name="unit-system"
-            value="metric"
-            ${DEFAULT_SETTINGS.unitSystem === "metric" ? "checked" : ""}
-          />
-          <span>Metric (°C)</span>
-        </label>
-        <label class="segmented-option">
-          <input
-            type="radio"
-            name="unit-system"
-            value="imperial"
-            ${DEFAULT_SETTINGS.unitSystem === "imperial" ? "checked" : ""}
-          />
-          <span>Imperial (°F)</span>
-        </label>
-      </div>
+      <segmented-input id="setting-units"></segmented-input>
     </div>
 
     <div class="section">

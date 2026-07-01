@@ -67,22 +67,10 @@ class SiteSettings extends HTMLElement {
 
   init() {
     this.settings = getSettings();
-    this.renderUnitSelector();
 
-    this.initUnitSelector();
-
-    this.initSliders();
     this.initReset();
-  }
-
-  initUnitSelector() {
-    this.panel
-      .querySelectorAll('input[name="unit-system"]')
-      .forEach((input) => {
-        input.addEventListener("change", (e) => {
-          updateSettings({ unitSystem: e.target.value });
-        });
-      });
+    this.initUnitSelector();
+    this.initSliders();
   }
 
   initReset() {
@@ -92,9 +80,15 @@ class SiteSettings extends HTMLElement {
     });
   }
 
-  renderUnitSelector() {
-    this.panel.querySelectorAll("input[name=unit-system]").forEach((input) => {
-      input.checked = input.value === this.settings.unitSystem;
+  initUnitSelector() {
+    const selector = this.panel.querySelector("#setting-units");
+    selector.options = [
+      { label: "Metric", value: "metric" },
+      { label: "Imperial", value: "imperial" },
+    ];
+    selector.value = this.settings.unitSystem;
+    selector.addEventListener("change", (e) => {
+      updateSettings({ unitSystem: e.target.value });
     });
   }
 

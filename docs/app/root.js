@@ -6,6 +6,7 @@ import "../components/panels/container.js";
 import "../components/footer/index.js";
 
 import "../components/form/slider/index.js";
+import "../components/form/segmented/index.js";
 
 import { globalSheet } from "../styles/sheets/global.js";
 import { runAnalysis } from "../core/analysis.js";
