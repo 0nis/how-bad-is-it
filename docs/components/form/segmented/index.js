@@ -26,7 +26,7 @@ class SegmentedOptionsInput extends HTMLElement {
 
   set value(v) {
     this._value = v;
-    this.render();
+    this.sync();
   }
 
   get value() {
@@ -34,19 +34,15 @@ class SegmentedOptionsInput extends HTMLElement {
   }
 
   connectedCallback() {
-    // this.wrap.addEventListener("click", (e) => {
-    //   const btn = e.target.closest(".segmented-option");
-    //   if (!btn) return;
-    //   this.value = btn.dataset.value;
-    //   this.dispatchEvent(
-    //     new CustomEvent("change", {
-    //       detail: { value: this.value },
-    //       bubbles: true,
-    //       composed: true,
-    //     }),
-    //   );
-    // });
-    // this.render();
+    this.render();
+  }
+
+  sync() {
+    const inputs = this.shadowRoot.querySelectorAll("input");
+
+    for (const input of inputs) {
+      input.checked = input.value === this._value;
+    }
   }
 
   render() {
@@ -55,30 +51,24 @@ class SegmentedOptionsInput extends HTMLElement {
 
     for (const { label, value } of this._options) {
       fragment.append(
-        el(
-          "label",
-          {
-            className: `segmented-option`,
-          },
-          [
-            el("input", {
-              type: "radio",
-              value: value,
-              checked: value === this._value,
-              onclick: () => {
-                this.value = value;
-                this.dispatchEvent(
-                  new Event("change", {
-                    detail: { value: this.value },
-                    bubbles: true,
-                    composed: true,
-                  }),
-                );
-              },
-            }),
-            el("span", {}, [label]),
-          ],
-        ),
+        el("label", { className: `segmented-option` }, [
+          el("input", {
+            type: "radio",
+            value: value,
+            checked: value === this._value,
+            onclick: () => {
+              this.value = value;
+              this.dispatchEvent(
+                new CustomEvent("change", {
+                  detail: { value: this.value },
+                  bubbles: true,
+                  composed: true,
+                }),
+              );
+            },
+          }),
+          el("span", {}, [label]),
+        ]),
       );
     }
 

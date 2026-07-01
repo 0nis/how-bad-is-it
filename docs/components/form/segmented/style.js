@@ -29,17 +29,24 @@ export const style = /* CSS */ `
         font-size: 0.825rem;
         font-weight: 500;
         color: var(--text-secondary);
-        transition: background 0.15s, color 0.15s;
+        background-color: transparent;  
+        transition: background-color 0.15s, color 0.15s;
         user-select: none;
         text-align: center;
     }
     
     .segmented-option input:checked + span {
-        background: var(--accent);
-        color: #0f0f13;
+        background-color: var(--accent);
+        color: var(--text-accent);
     }
     
     .segmented-option:hover input:not(:checked) + span {
         color: var(--text-primary);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .segmented-option span {
+            transition: none;
+        }
     }
 `;
