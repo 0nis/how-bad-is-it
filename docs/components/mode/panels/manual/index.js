@@ -3,6 +3,7 @@ import { setState, subscribe } from "../../../../app/store.js";
 import { globalSheet } from "../../../../styles/sheets/global.js";
 import { renderShadow } from "../../../../utils/shadow.js";
 import { pluralize } from "../../../../utils/string.js";
+import { fToC } from "../../../../utils/weather.js";
 import { modeSheet } from "../../style.js";
 import { template } from "./template.js";
 
@@ -65,8 +66,10 @@ class ModeManualPanel extends HTMLElement {
     });
 
     this.tempInputEl.addEventListener("input", () => {
+      let newTemp = this.comparisonTypeInput.value;
+      if (getSettings().unitSystem === "imperial") value = fToC(newTemp);
       setState({
-        options: { manual: { temperature: this.tempInputEl.value } },
+        options: { manual: { temperature: newTemp } },
       });
       this.checkIfReady();
     });

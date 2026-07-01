@@ -45,6 +45,14 @@ export function cToF(c) {
 }
 
 /**
+ * @param {number} f °F
+ * @returns {number} °C
+ */
+export function fToC(f) {
+  return ((f - 32) * 5) / 9;
+}
+
+/**
  * @param {number} mm mm (millimeters)
  * @returns {number} in (inches)
  */
