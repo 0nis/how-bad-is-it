@@ -1,6 +1,15 @@
 import { fetchCurrentConditions } from "../api/current.js";
-import { fetchHistoricalWeather } from "../api/history.js";
-import { getHourFromISO, shiftDays, toDateStr } from "../utils/date.js";
+import {
+  fetchDailyHistoricalWeather,
+  fetchHourlyHistoricalWeather,
+} from "../api/history.js";
+import {
+  dayOfYear,
+  getHourFromISO,
+  shiftDays,
+  shiftYears,
+  toDateStr,
+} from "../utils/date.js";
 import { getState, setState } from "../app/store.js";
 import { toChunks } from "../utils/objects.js";
 import {
@@ -32,12 +41,21 @@ export async function runAnalysis() {
     /**
      * @type {{
      *   conditions: typeof CONDITIONS,
-     *   readings: typeof CONDITIONS[]
+     *   stats: typeof HISTORICAL[],
+     *   sigma: number,
+     *   sampleSize: number
+     *   basedOn: {
+     *      mode: "temperature" | "apparentTemperature",
+     *      comparison: "min" | "max" | "mean"
+     *   }
      * }}
      */
     let data = {
       conditions: null,
-      readings: null,
+      stats: null,
+      sigma: null,
+      sampleSize: null,
+      basedOn: null,
     };
 
     switch (state.mode) {
@@ -54,33 +72,10 @@ export async function runAnalysis() {
         throw new Error("Unknown mode: " + mode);
     }
 
-    const { conditions, readings } = data;
+    const { conditions, stats, sigma } = data;
     if (!conditions) throw new Error("Failed to fetch conditions");
-    if (!readings) throw new Error("Failed to fetch readings");
-
-    // prettier-ignore
-    const stats = {
-      temperature: computeStats(readings.map((r) => r.temperature)),
-      apparentTemperature: computeStats(readings.map((r) => r.apparentTemperature).filter(Boolean)),
-      humidity: computeStats(readings.map((r) => r.humidity).filter(Boolean)),
-      windSpeed: computeStats(readings.map((r) => r.windSpeed).filter(Boolean)),
-      precipitation: computeStats(readings.map((r) => r.precipitation).filter(Boolean)),
-      cloudCover: computeStats(readings.map((r) => r.cloudCover).filter(Boolean)),
-    };
-
-    const useApparentTemp =
-      conditions.apparentTemperature !== undefined &&
-      stats.apparentTemperature.count > settings.minReadings;
-
-    const tempStats = useApparentTemp
-      ? stats.apparentTemperature
-      : stats.temperature;
-
-    const sigma = toSigma(
-      useApparentTemp ? conditions.apparentTemperature : conditions.temperature,
-      tempStats.mean,
-      tempStats.std,
-    );
+    if (!stats) throw new Error("Failed to compute stats");
+    if (!sigma) throw new Error("Failed to compute sigma");
 
     setState({
       status: "success",
@@ -94,8 +89,8 @@ export async function runAnalysis() {
         frequency: sigmaToFrequency(sigma),
         severity: sigmaToSeverity(sigma),
         label: sigmaToLabel(sigma),
-        sampleSize: tempStats.count,
-        basedOn: useApparentTemp ? "feels" : "raw",
+        sampleSize: data.sampleSize,
+        basedOn: data.basedOn,
         observed: conditions,
         historical: stats,
         settings: settings,
@@ -125,7 +120,7 @@ async function runAnalysisCurrent(state, settings, location) {
     location.longitude,
   );
 
-  const historicalReadings = await fetchHistoricalWindow(
+  const historicalReadings = await fetchHourlyHistoricalWindow(
     location.latitude,
     location.longitude,
     conditions.datetime,
@@ -137,17 +132,40 @@ async function runAnalysisCurrent(state, settings, location) {
     const hour = getHourFromISO(r.datetime);
     return Math.abs(hour - targetHour) <= settings.windowHours;
   });
-  if (windowedReadings.length < settings.minReadings) {
-    setState({
-      status: "error",
-      error: "Not enough historical data for this location and time of day.",
-    });
-    return;
-  }
+
+  if (windowedReadings.length < settings.minReadings)
+    throw new Error(
+      "Not enough historical data for this location and time of day.",
+    );
+
+  // prettier-ignore
+  const stats = {
+    temperature: computeStats(windowedReadings.map((r) => r.temperature)),
+    apparentTemperature: computeStats(windowedReadings.map((r) => r.apparentTemperature).filter(Boolean)),
+    humidity: computeStats(windowedReadings.map((r) => r.humidity).filter(Boolean)),
+    windSpeed: computeStats(windowedReadings.map((r) => r.windSpeed).filter(Boolean)),
+    precipitation: computeStats(windowedReadings.map((r) => r.precipitation).filter(Boolean)),
+    cloudCover: computeStats(windowedReadings.map((r) => r.cloudCover).filter(Boolean)),
+  };
+
+  // TODO: Add user setting to prefer raw temp
+  const mode =
+    conditions.apparentTemperature !== undefined &&
+    stats.apparentTemperature.count > settings.minReadings
+      ? "apparentTemperature"
+      : "temperature";
+
+  const sigma = toSigma(conditions[mode], stats[mode].mean, stats[mode].std);
 
   return {
     conditions,
-    readings: windowedReadings,
+    stats,
+    sigma,
+    sampleSize: stats[mode].count,
+    basedOn: {
+      mode,
+      comparison: "mean",
+    },
   };
 }
 
@@ -160,13 +178,67 @@ async function runAnalysisCurrent(state, settings, location) {
  * }}
  */
 async function runAnalysisPast(state, settings, location) {
-  // conditions = await fetchPastConditions(
-  //   state.options.past.date,
-  //   state.options.past.comparison,
-  //   location.latitude,
-  //   location.longitude,
-  // );
-  throw new Error("Not implemented");
+  const endDate = state.options.past.date;
+  if (!endDate) throw new Error("Please select a date");
+  const startDate = shiftYears(endDate, settings.historicalYears);
+
+  const readings = await fetchDailyHistoricalWeather(
+    location.latitude,
+    location.longitude,
+    startDate,
+    endDate,
+  );
+
+  const targetDate = endDate;
+  const targetDOY = dayOfYear(targetDate);
+  const windowedReadings = readings.filter((r) => {
+    const doy = dayOfYear(r.datetime);
+    let diff = Math.abs(doy - targetDOY);
+    diff = Math.min(diff, 365 - diff);
+    return diff <= settings.windowDays;
+  });
+
+  if (windowedReadings.length < settings.minReadings)
+    throw new Error(
+      "Not enough historical data for this location and time of year.",
+    );
+
+  const conditions = readings.find((r) => r.datetime === targetDate);
+  if (!conditions) throw new Error("Failed to fetch conditions");
+
+  // prettier-ignore
+  const stats = {
+    temperature: {
+      min: computeStats(windowedReadings.map((r) => r.temperature.min).filter(Boolean)),
+      max: computeStats(windowedReadings.map((r) => r.temperature.max).filter(Boolean)),
+    },
+    apparentTemperature: {
+      min: computeStats(windowedReadings.map((r) => r.apparentTemperature.min).filter(Boolean)),
+      max: computeStats(windowedReadings.map((r) => r.apparentTemperature.max).filter(Boolean)),
+    }
+  };
+
+  // TODO: Add user setting to prefer raw temp
+  const mode =
+    conditions.apparentTemperature !== undefined
+      ? "apparentTemperature"
+      : "temperature";
+
+  const value =
+    mode === "raw" ? conditions.temperature : conditions.apparentTemperature;
+
+  const sigma = toSigma(value.max, stats[mode].max.mean, stats[mode].max.std);
+
+  return {
+    conditions,
+    stats,
+    sigma,
+    sampleSize: stats[mode].max.count,
+    basedOn: {
+      mode,
+      comparison: "max",
+    },
+  };
 }
 
 /**
@@ -178,7 +250,51 @@ async function runAnalysisPast(state, settings, location) {
  * }}
  */
 async function runAnalysisManual(state, settings, location) {
-  throw new Error("Not implemented");
+  const now = new Date();
+  const conditions = {
+    datetime: now.toISOString(),
+    temperature: state.options.manual.temperature,
+  };
+  if (!conditions.temperature) throw new Error("Please enter a temperature");
+
+  const comparison = state.options.manual.comparison;
+  if (!comparison || !["min", "max"].includes(comparison))
+    throw new Error("Please select either daily min or max");
+
+  const endDate = toDateStr(now);
+  const startDate = shiftYears(endDate, settings.historicalYears);
+
+  const historicalReadings = await fetchDailyHistoricalWeather(
+    location.latitude,
+    location.longitude,
+    startDate,
+    endDate,
+  );
+
+  // prettier-ignore
+  const stats = {
+    temperature: {
+      min: computeStats(historicalReadings.map((r) => r.temperature.min).filter(Boolean)),
+      max: computeStats(historicalReadings.map((r) => r.temperature.max).filter(Boolean)),
+    }
+  }
+
+  const sigma = toSigma(
+    conditions.temperature,
+    stats.temperature[comparison].mean,
+    stats.temperature[comparison].std,
+  );
+
+  return {
+    conditions,
+    stats,
+    sigma,
+    sampleSize: stats.temperature[comparison].count,
+    basedOn: {
+      mode: "temperature",
+      comparison,
+    },
+  };
 }
 
 /**
@@ -194,7 +310,7 @@ async function runAnalysisManual(state, settings, location) {
  * @param {number} timeoutMs Timeout between each chunk of requests in ms
  * @returns {Promise<typeof CONDITIONS[]>}
  */
-async function fetchHistoricalWindow(
+async function fetchHourlyHistoricalWindow(
   lat,
   lon,
   referenceTime,
@@ -212,7 +328,7 @@ async function fetchHistoricalWindow(
     const end = shiftDays(center, settings.windowDays);
 
     return () =>
-      fetchHistoricalWeather(lat, lon, toDateStr(start), toDateStr(end));
+      fetchHourlyHistoricalWeather(lat, lon, toDateStr(start), toDateStr(end));
   });
 
   const chunks = toChunks(requests, chunkSize);

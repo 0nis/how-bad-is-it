@@ -11,7 +11,7 @@ const state = {
     },
     manual: {
       temperature: null,
-      comparison: null,
+      comparison: "max",
     },
   },
   status: "idle",
@@ -33,7 +33,18 @@ export function getState() {
  * @param {Partial<typeof APPSTATE>} patch
  */
 export function setState(patch) {
-  Object.assign(state, patch);
+  for (const key in patch) {
+    if (
+      typeof patch[key] === "object" &&
+      patch[key] !== null &&
+      !Array.isArray(patch[key])
+    )
+      state[key] = {
+        ...state[key],
+        ...patch[key],
+      };
+    else state[key] = patch[key];
+  }
 
   listeners.forEach((fn) => fn(state));
 }

@@ -34,6 +34,32 @@ export function shiftDays(date, days) {
 }
 
 /**
+ * Shifts a date by a specific number of years.
+ *
+ * @param {string} dateStr YYYY-MM-DD
+ * @param {number} years Number of years to shift
+ * @returns {string} YYYY-MM-DD
+ */
+export function shiftYears(dateStr, years) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return `${y - years}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
+/**
+ * Returns the day of the year for a given date.
+ *
+ * @param {string} dateStr YYYY-MM-DD
+ * @returns {number} Day of the year
+ */
+export function dayOfYear(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+
+  const start = Date.UTC(y, 0, 0);
+  return Math.floor((date - start) / 86400000);
+}
+
+/**
  * Formats an ISO 8601 string to a human-readable datetime while preserving the original timezone.
  *
  * @param {string} iso ISO 8601 string

@@ -28,7 +28,10 @@
  *    severity: number,
  *    frequency: string,
  *    sampleSize: number,
- *    basedOn: "raw" | "feels",
+ *    basedOn: {
+ *       mode: "temperature" | "apparentTemperature",
+ *       comparison: "min" | "max" | "mean"
+ *    },
  *    observed: typeof CONDITIONS,
  *    historical: typeof HISTORICAL,
  *    settings: typeof DEFAULT_SETTINGS
@@ -74,6 +77,21 @@ export const LOCATION = {};
 export const CONDITIONS = {};
 
 /**
+ * @type {{
+ *   datetime?: string,
+ *   temperature?: {
+ *     min: number,
+ *     max: number,
+ *   }
+ *   apparentTemperature?: {
+ *     min: number,
+ *     max: number,
+ *   }
+ * }}
+ */
+export const DAILY_CONDITIONS = {};
+
+/**
  * @type {{ mean: number, std: number, count: number }}
  */
 export const STATS = {};
@@ -86,6 +104,15 @@ export const STATS = {};
  *    windSpeed?: typeof STATS,
  *    precipitation?: typeof STATS,
  *    cloudCover?: typeof STATS,
+ * } | {
+ *    temperature?: {
+ *      min?: typeof STATS,
+ *      max?: typeof STATS
+ *    },
+ *    apparentTemperature?: {
+ *      min?: typeof STATS,
+ *      max?: typeof STATS
+ *    }
  * }}
  */
 export const HISTORICAL = {};

@@ -7,6 +7,8 @@ import { fToC } from "../../../../utils/weather.js";
 import { modeSheet } from "../../style.js";
 import { template } from "./template.js";
 
+// TODO: Add a seasonal selector? Maybe?
+
 class ModeManualPanel extends HTMLElement {
   constructor() {
     super();
@@ -57,26 +59,38 @@ class ModeManualPanel extends HTMLElement {
       { label: "Daily high", value: "max" },
       { label: "Daily low", value: "min" },
     ];
-    this.comparisonTypeInput.value = "max";
     this.comparisonTypeInput.addEventListener("change", () => {
-      setState({
-        options: { manual: { comparison: this.comparisonTypeInput.value } },
-      });
+      this.updateState();
       this.checkIfReady();
     });
 
     this.tempInputEl.addEventListener("input", () => {
-      let newTemp = this.comparisonTypeInput.value;
-      if (getSettings().unitSystem === "imperial") value = fToC(newTemp);
-      setState({
-        options: { manual: { temperature: newTemp } },
-      });
+      let newTemp;
+      if (getSettings().unitSystem === "imperial")
+        newTemp = fToC(this.tempInputEl.value);
+      else newTemp = this.tempInputEl.value;
+
+      this.updateState();
       this.checkIfReady();
     });
   }
 
   render() {
     renderShadow(this.shadowRoot, template);
+  }
+
+  updateState() {
+    let temp = this.tempInputEl.value;
+    if (getSettings().unitSystem === "imperial")
+      temp = fToC(this.tempInputEl.value);
+    setState({
+      options: {
+        manual: {
+          temperature: temp,
+          comparison: this.comparisonTypeInput.value,
+        },
+      },
+    });
   }
 
   checkIfReady() {

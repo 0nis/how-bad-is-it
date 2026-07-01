@@ -98,12 +98,10 @@ export function sigmaToSeverity(sigma) {
   const abs = Math.abs(sigma);
   if (abs < 0.5) return 0;
   if (abs < 1.0) return 1;
-  if (abs < 1.5) return 2;
-  if (abs < 2.0) return 3;
-  if (abs < 2.5) return 4;
-  if (abs < 3.0) return 5;
-  if (abs < 4.0) return 6;
-  return 7;
+  if (abs < 2.0) return 2;
+  if (abs < 3.0) return 3;
+  if (abs < 4.0) return 4;
+  return 5;
 }
 
 /**
@@ -126,7 +124,5 @@ export function sigmaToLabel(sigma) {
   ];
 
   const match = thresholds.find((t) => abs < t.limit);
-  return match
-    ? match.label
-    : pick("Record-breaking heat", "Record-breaking cold");
+  return match ? match.label : pick("INSANE HEAT", "INSANE COLD");
 }
