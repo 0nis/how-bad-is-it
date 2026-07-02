@@ -38,14 +38,14 @@ class ResultContext extends HTMLElement {
       case "current":
         children.push(
           el("p", {
-            textContent: `Compared using ${this.format(metric)} from the same time (±${windowHours} h), within ±${windowDays} days, across ${historicalYears} years, with a sample size of ${sampleSize}.`,
+            textContent: `Compared using ${this.format(metric)} from the same time (±${windowHours} h), within ±${windowDays} days, across ${historicalYears} years, with a sample size of ${sampleSize}`,
           }),
         );
         break;
       case "past":
         children.push(
           el("p", {
-            textContent: `Compared using daily ${this.format(aggregation)} ${this.format(metric)} within ±${windowDays} days, across ${historicalYears} years, with a sample size of ${sampleSize}.`,
+            textContent: `Compared using daily ${this.format(aggregation)} ${this.format(metric)} within ±${windowDays} days, across ${historicalYears} years, with a sample size of ${sampleSize}`,
           }),
         );
         break;
@@ -58,7 +58,7 @@ class ResultContext extends HTMLElement {
         );
         children.push(
           el("p", {
-            textContent: `Compared using daily ${this.format(aggregation)} ${this.format(metric)} in ${season}, across ${historicalYears} years, with a sample size of ${sampleSize}.`,
+            textContent: `Compared using daily ${this.format(aggregation)} ${this.format(metric)} in ${season}, across ${historicalYears} years, with a sample size of ${sampleSize}`,
           }),
         );
         break;
