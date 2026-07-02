@@ -9,8 +9,9 @@ export const template = /* HTML */ `
     </div>
     <div class="actions">
       <p class="description">
-        Compares a historic date's peak feels-like temperature to the historical
-        average peak for similar dates over the past
+        Compares a historic date's peak
+        <span id="comparison-metric">feels-like</span> temperature to the
+        historical average peak for similar dates over the past
         <span id="year-count">${DEFAULT_SETTINGS.historicalYears}</span>
         <span id="year-count-desc">years</span>.
       </p>

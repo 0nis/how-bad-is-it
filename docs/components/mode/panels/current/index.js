@@ -4,7 +4,6 @@ import { globalSheet } from "../../../../styles/sheets/global.js";
 import { renderShadow } from "../../../../utils/shadow.js";
 import { pluralize } from "../../../../utils/string.js";
 import { modeSheet } from "../../style.js";
-import { setYearCount } from "../helpers.js";
 import { template } from "./template.js";
 
 class ModeCurrentPanel extends HTMLElement {
@@ -17,6 +16,11 @@ class ModeCurrentPanel extends HTMLElement {
   connectedCallback() {
     renderShadow(this.shadowRoot, template);
 
+    this.yearCountEl = this.shadowRoot.querySelector("#year-count");
+    this.yearCountDescEl = this.shadowRoot.querySelector("#year-count-desc");
+    this.comparisonMetricEl =
+      this.shadowRoot.querySelector("#comparison-metric");
+
     this.unsubscribeState = subscribe(
       (state) => state.mode,
       (mode) => {
@@ -24,15 +28,26 @@ class ModeCurrentPanel extends HTMLElement {
       },
     );
 
-    this.unsubscribeSettings = setYearCount(
-      this.shadowRoot.querySelector("#year-count"),
-      this.shadowRoot.querySelector("#year-count-desc"),
-    );
+    this.unsubscribeSettings = subscribeToSettings((settings) => {
+      this.sync();
+    });
   }
 
   disconnectedCallback() {
     this.unsubscribeState?.();
     this.unsubscribeSettings?.();
+  }
+
+  sync() {
+    this.settings = getSettings();
+
+    this.yearCountEl.textContent = this.settings.historicalYears;
+    this.yearCountDescEl.textContent = pluralize(
+      "year",
+      this.settings.historicalYears,
+    );
+    this.comparisonMetricEl.textContent =
+      this.settings.comparisonMetric === "raw" ? "air" : "feels-like";
   }
 }
 

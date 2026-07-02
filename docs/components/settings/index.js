@@ -69,7 +69,7 @@ class SiteSettings extends HTMLElement {
     this.settings = getSettings();
 
     this.initReset();
-    this.initUnitSelector();
+    this.initSegmentedInputs();
     this.initSliders();
   }
 
@@ -80,15 +80,27 @@ class SiteSettings extends HTMLElement {
     });
   }
 
-  initUnitSelector() {
-    const selector = this.panel.querySelector("#setting-units");
-    selector.options = [
+  initSegmentedInputs() {
+    const unitSystemInput = this.panel.querySelector("#setting-units");
+    unitSystemInput.options = [
       { label: "Metric", value: "metric" },
       { label: "Imperial", value: "imperial" },
     ];
-    selector.value = this.settings.unitSystem;
-    selector.addEventListener("change", (e) => {
+    unitSystemInput.value = this.settings.unitSystem;
+    unitSystemInput.addEventListener("change", (e) => {
       updateSettings({ unitSystem: e.target.value });
+    });
+
+    const comparisonMetricInput = this.panel.querySelector(
+      "#setting-comparison-metric",
+    );
+    comparisonMetricInput.options = [
+      { label: "Raw Air Temperature", value: "raw" },
+      { label: "Feels-like Temperature", value: "apparent" },
+    ];
+    comparisonMetricInput.value = this.settings.comparisonMetric;
+    comparisonMetricInput.addEventListener("change", (e) => {
+      updateSettings({ comparisonMetric: e.target.value });
     });
   }
 

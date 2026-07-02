@@ -4,6 +4,9 @@ export const DEFAULT_SETTINGS = {
   /** @type {"metric" | "imperial"} */
   unitSystem: "metric",
 
+  /** @type {"raw" | "apparent"} */
+  comparisonMetric: "apparent",
+
   /** The number of years of historical data to fetch */
   historicalYears: 30,
 
@@ -95,6 +98,12 @@ function sanitise(partial) {
     String(partial.unitSystem).toLowerCase() === "imperial"
   )
     clean.unitSystem = partial.unitSystem;
+
+  if (
+    String(partial.comparisonMetric).toLowerCase() === "raw" ||
+    String(partial.comparisonMetric).toLowerCase() === "apparent"
+  )
+    clean.comparisonMetric = partial.comparisonMetric;
 
   for (const key of Object.keys(SETTINGS_BOUNDS)) {
     if (partial[key] === undefined) continue;

@@ -24,6 +24,13 @@ export const template = /* HTML */ `
     </div>
 
     <div class="section">
+      <label for="setting-comparison-metric" class="section-label"
+        >Compare by</label
+      >
+      <segmented-input id="setting-comparison-metric"></segmented-input>
+    </div>
+
+    <div class="section">
       <slider-input id="setting-historical-years" unit="yr">
         <label
           slot="label"

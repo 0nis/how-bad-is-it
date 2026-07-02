@@ -58,21 +58,23 @@ export async function runAnalysisCurrent(state, settings, location) {
     cloudCover: computeStats(windowedReadings.map((r) => r.cloudCover).filter(Boolean)),
   };
 
-  // TODO: Add user setting to prefer raw temp
-  const mode =
-    conditions.apparentTemperature !== undefined &&
-    stats.apparentTemperature.count > settings.minReadings
-      ? "apparentTemperature"
-      : "temperature";
+  const preferred =
+    settings.comparisonMetric === "raw" ? "temperature" : "apparentTemperature";
 
-  const sigma = toSigma(conditions[mode], stats[mode].mean, stats[mode].std);
+  const value = conditions[preferred];
+  const stat = stats[preferred];
+
+  if (value == null || stat == null || stat.count < settings.minReadings)
+    throw new Error("Insufficient data for this metric on this time of day.");
+
+  const sigma = toSigma(value, stat.mean, stat.std);
 
   return {
     conditions,
     stats,
     sigma,
-    sampleSize: stats[mode].count,
-    basedOn: mode,
+    sampleSize: stat.count,
+    basedOn: preferred,
     readings: windowedReadings,
   };
 }

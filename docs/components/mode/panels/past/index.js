@@ -5,7 +5,6 @@ import { shiftDays, toDateStr } from "../../../../utils/date.js";
 import { renderShadow } from "../../../../utils/shadow.js";
 import { pluralize } from "../../../../utils/string.js";
 import { modeSheet } from "../../style.js";
-import { setYearCount } from "../helpers.js";
 import { template } from "./template.js";
 
 class ModePastPanel extends HTMLElement {
@@ -25,10 +24,9 @@ class ModePastPanel extends HTMLElement {
       },
     );
 
-    this.unsubscribeSettings = setYearCount(
-      this.shadowRoot.querySelector("#year-count"),
-      this.shadowRoot.querySelector("#year-count-desc"),
-    );
+    this.unsubscribeSettings = subscribeToSettings((settings) => {
+      this.sync();
+    });
   }
 
   disconnectedCallback() {
@@ -38,6 +36,11 @@ class ModePastPanel extends HTMLElement {
 
   init() {
     this.render();
+
+    this.yearCountEl = this.shadowRoot.querySelector("#year-count");
+    this.yearCountDescEl = this.shadowRoot.querySelector("#year-count-desc");
+    this.comparisonMetricEl =
+      this.shadowRoot.querySelector("#comparison-metric");
 
     this.dateEl = this.shadowRoot.querySelector("#date");
     this.startBtn = this.shadowRoot.querySelector("start-analysis-button");
@@ -57,6 +60,18 @@ class ModePastPanel extends HTMLElement {
   checkIfReady() {
     if (this.dateEl.value) this.startBtn.ready = true;
     else this.startBtn.ready = false;
+  }
+
+  sync() {
+    this.settings = getSettings();
+
+    this.yearCountEl.textContent = this.settings.historicalYears;
+    this.yearCountDescEl.textContent = pluralize(
+      "year",
+      this.settings.historicalYears,
+    );
+    this.comparisonMetricEl.textContent =
+      this.settings.comparisonMetric === "raw" ? "air" : "feels-like";
   }
 }
 

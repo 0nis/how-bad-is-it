@@ -82,24 +82,23 @@ export async function runAnalysisPast(state, settings, location) {
     }
   };
 
-  // TODO: Add user setting to prefer raw temp
-  const mode =
-    conditions.apparentTemperature !== undefined
-      ? "apparentTemperature"
-      : "temperature";
+  const preferred =
+    settings.comparisonMetric === "raw" ? "temperature" : "apparentTemperature";
 
-  const sigma = toSigma(
-    conditions[mode].max,
-    stats[mode].max.mean,
-    stats[mode].max.std,
-  );
+  const value = conditions[preferred];
+  const stat = stats[preferred];
+
+  if (value == null || stat == null || stat.max.count < settings.minReadings)
+    throw new Error("Insufficient data for this metric on this time of day.");
+
+  const sigma = toSigma(value.max, stat.max.mean, stat.max.std);
 
   return {
     conditions,
     stats,
     sigma,
-    sampleSize: stats[mode].max.count,
-    basedOn: `${mode}.max`,
+    sampleSize: stat.max.count,
+    basedOn: `${preferred}.max`,
     readings: windowedReadings,
   };
 }
