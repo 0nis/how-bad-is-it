@@ -5,6 +5,8 @@ import { style } from "./style.js";
 import { template } from "./template.js";
 import { APPSTATE } from "../../../../../types.js";
 
+// TODO: Remove the time in past mode, add season instead of date in manual
+
 class ResultHero extends HTMLElement {
   constructor() {
     super();

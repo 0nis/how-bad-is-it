@@ -100,9 +100,13 @@ export async function fetchDailyHistoricalWeather(
   url.searchParams.set("timezone", "auto");
 
   const res = await fetchWithRetry(url);
-  if (!res.ok) throw new Error(`Daily archive fetch failed: ${res.status}`);
-
   const data = await res.json();
+  if (!res.ok) {
+    if (res.status === 404) return [];
+    throw new Error(
+      `${res.status}: ${res.statusText}${data.reason ? `: ${data.reason}` : ""}`,
+    );
+  }
 
   const days = [];
   const d = data.daily;

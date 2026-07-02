@@ -1,6 +1,7 @@
 import { getSettings, subscribeToSettings } from "../../../../app/settings.js";
 import { setState, subscribe } from "../../../../app/store.js";
 import { globalSheet } from "../../../../styles/sheets/global.js";
+import { shiftDays, toDateStr } from "../../../../utils/date.js";
 import { renderShadow } from "../../../../utils/shadow.js";
 import { pluralize } from "../../../../utils/string.js";
 import { modeSheet } from "../../style.js";
@@ -41,6 +42,8 @@ class ModePastPanel extends HTMLElement {
     this.dateEl = this.shadowRoot.querySelector("#date");
     this.startBtn = this.shadowRoot.querySelector("start-analysis-button");
 
+    this.dateEl.setAttribute("min", "1940-01-01");
+    this.dateEl.setAttribute("max", toDateStr(shiftDays(new Date(), -1)));
     this.dateEl.addEventListener("input", () => {
       setState({ options: { past: { date: this.dateEl.value } } });
       this.checkIfReady();

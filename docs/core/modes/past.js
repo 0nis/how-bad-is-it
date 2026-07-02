@@ -1,8 +1,22 @@
 import { fetchDailyHistoricalWeather } from "../../api/history.js";
-import { dayOfYear, shiftYears } from "../../utils/date.js";
+import {
+  clampDate,
+  dayOfYear,
+  getYearFromISO,
+  shiftDays,
+  shiftYears,
+  toDateStr,
+} from "../../utils/date.js";
 import { computeStats, toSigma } from "../calculation.js";
 import { DEFAULT_SETTINGS } from "../../app/settings.js";
-import { CONDITIONS, APPSTATE, HISTORICAL, LOCATION } from "../../types.js";
+import {
+  CONDITIONS,
+  APPSTATE,
+  HISTORICAL,
+  LOCATION,
+  DAILY_CONDITIONS,
+} from "../../types.js";
+import { MIN_DATE } from "../../constants.js";
 
 /**
  * @param {typeof APPSTATE} state
@@ -12,17 +26,27 @@ import { CONDITIONS, APPSTATE, HISTORICAL, LOCATION } from "../../types.js";
  *   conditions: typeof CONDITIONS,
  *   stats: typeof HISTORICAL[],
  *   sigma: number,
- *   sampleSize: number
+ *   sampleSize: number,
  *   basedOn: {
  *      mode: "temperature" | "apparentTemperature",
  *      comparison: "min" | "max" | "mean"
- *   }
+ *   },
+ *   readings: typeof DAILY_CONDITIONS[],
  * }}
  */
 export async function runAnalysisPast(state, settings, location) {
-  const endDate = state.options.past.date;
-  if (!endDate) throw new Error("Please select a date");
-  const startDate = shiftYears(endDate, settings.historicalYears);
+  const targetDate = state.options.past.date;
+  if (!targetDate) throw new Error("Please select a date");
+
+  const calcEndDate = shiftDays(targetDate, settings.windowDays);
+  const calcStartDate = shiftYears(
+    shiftDays(targetDate, -settings.windowDays),
+    settings.historicalYears,
+  );
+
+  const maxDate = shiftDays(toDateStr(new Date()), -1);
+  const startDate = clampDate(calcStartDate, MIN_DATE, maxDate);
+  const endDate = clampDate(calcEndDate, startDate, maxDate);
 
   const readings = await fetchDailyHistoricalWeather(
     location.latitude,
@@ -31,9 +55,10 @@ export async function runAnalysisPast(state, settings, location) {
     endDate,
   );
 
-  const targetDate = endDate;
   const targetDOY = dayOfYear(targetDate);
   const windowedReadings = readings.filter((r) => {
+    if (!r.datetime) return false;
+    if (getYearFromISO(r.datetime) === getYearFromISO(targetDate)) return false;
     const doy = dayOfYear(r.datetime);
     let diff = Math.abs(doy - targetDOY);
     diff = Math.min(diff, 365 - diff);
@@ -80,5 +105,6 @@ export async function runAnalysisPast(state, settings, location) {
       mode,
       comparison: "max",
     },
+    readings: windowedReadings,
   };
 }

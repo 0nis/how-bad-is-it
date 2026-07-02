@@ -1,8 +1,14 @@
 import { fetchDailyHistoricalWeather } from "../../api/history.js";
-import { shiftYears, toDateStr } from "../../utils/date.js";
+import { getMonthFromISO, shiftYears, toDateStr } from "../../utils/date.js";
 import { computeStats, toSigma } from "../calculation.js";
 import { DEFAULT_SETTINGS } from "../../app/settings.js";
-import { LOCATION, CONDITIONS, HISTORICAL, APPSTATE } from "../../types.js";
+import {
+  LOCATION,
+  CONDITIONS,
+  HISTORICAL,
+  APPSTATE,
+  DAILY_CONDITIONS,
+} from "../../types.js";
 
 /** Months corresponding to each season, per hemisphere (northern or southern) */
 const SEASONS = {
@@ -28,11 +34,12 @@ const SEASONS = {
  *   conditions: typeof CONDITIONS,
  *   stats: typeof HISTORICAL[],
  *   sigma: number,
- *   sampleSize: number
+ *   sampleSize: number,
  *   basedOn: {
  *      mode: "temperature" | "apparentTemperature",
  *      comparison: "min" | "max" | "mean"
- *   }
+ *   },
+ *   readings: typeof DAILY_CONDITIONS[],
  * }}
  */
 export async function runAnalysisManual(state, settings, location) {
@@ -54,20 +61,25 @@ export async function runAnalysisManual(state, settings, location) {
   const endDate = toDateStr(now);
   const startDate = shiftYears(endDate, settings.historicalYears);
 
-  const historicalReadings = await fetchDailyHistoricalWeather(
+  const readings = await fetchDailyHistoricalWeather(
     location.latitude,
     location.longitude,
     startDate,
     endDate,
   );
 
-  // TODO: Make season picker function
+  const hemisphere = location.latitude >= 0 ? "northern" : "southern";
+  const months = SEASONS[hemisphere][season];
+
+  const windowedReadings = readings.filter((r) => {
+    return months.includes(getMonthFromISO(r.datetime));
+  });
 
   // prettier-ignore
   const stats = {
     temperature: {
-      min: computeStats(historicalReadings.map((r) => r.temperature.min).filter(Boolean)),
-      max: computeStats(historicalReadings.map((r) => r.temperature.max).filter(Boolean)),
+      min: computeStats(windowedReadings.map((r) => r.temperature.min).filter(Boolean)),
+      max: computeStats(windowedReadings.map((r) => r.temperature.max).filter(Boolean)),
     }
   }
 
@@ -86,5 +98,6 @@ export async function runAnalysisManual(state, settings, location) {
       mode: "temperature",
       comparison,
     },
+    readings: windowedReadings,
   };
 }

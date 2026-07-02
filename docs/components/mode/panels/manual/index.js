@@ -8,8 +8,6 @@ import { modeSheet } from "../../style.js";
 import { flower, leaf, snowflake, sun } from "./icons.js";
 import { template } from "./template.js";
 
-// TODO: Add a seasonal selector? Maybe?
-
 class ModeManualPanel extends HTMLElement {
   constructor() {
     super();

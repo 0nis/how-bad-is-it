@@ -1,6 +1,11 @@
 import { fetchCurrentConditions } from "../../api/current.js";
 import { fetchHourlyHistoricalWeather } from "../../api/history.js";
-import { getHourFromISO, shiftDays, toDateStr } from "../../utils/date.js";
+import {
+  getHourFromISO,
+  shiftDays,
+  shiftYears,
+  toDateStr,
+} from "../../utils/date.js";
 import { toChunks } from "../../utils/objects.js";
 import { computeStats, toSigma } from "../calculation.js";
 import { DEFAULT_SETTINGS } from "../../app/settings.js";
@@ -14,11 +19,12 @@ import { LOCATION, CONDITIONS, HISTORICAL, APPSTATE } from "../../types.js";
  *   conditions: typeof CONDITIONS,
  *   stats: typeof HISTORICAL[],
  *   sigma: number,
- *   sampleSize: number
+ *   sampleSize: number,
  *   basedOn: {
  *      mode: "temperature" | "apparentTemperature",
  *      comparison: "min" | "max" | "mean"
- *   }
+ *   },
+ *   readings: typeof CONDITIONS[],
  * }}
  */
 export async function runAnalysisCurrent(state, settings, location) {
@@ -73,6 +79,7 @@ export async function runAnalysisCurrent(state, settings, location) {
       mode,
       comparison: "mean",
     },
+    readings: windowedReadings,
   };
 }
 
@@ -100,14 +107,11 @@ async function fetchHourlyHistoricalWindow(
   const requests = Array.from({ length: settings.historicalYears }, (_, i) => {
     const year = i + 1;
 
-    const center = new Date(referenceTime);
-    center.setFullYear(center.getFullYear() - year);
-
+    const center = shiftYears(toDateStr(referenceTime), year);
     const start = shiftDays(center, -settings.windowDays);
     const end = shiftDays(center, settings.windowDays);
 
-    return () =>
-      fetchHourlyHistoricalWeather(lat, lon, toDateStr(start), toDateStr(end));
+    return () => fetchHourlyHistoricalWeather(lat, lon, start, end);
   });
 
   const chunks = toChunks(requests, chunkSize);

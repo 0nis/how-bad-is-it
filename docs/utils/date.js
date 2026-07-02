@@ -1,11 +1,12 @@
 /**
  * Format a Date as YYYY-MM-DD for Open-Meteo query params
  *
- * @param {Date} date The date to format
+ * @param {Date | string} date The date to format
  * @returns {string} The formatted date
  */
 export function toDateStr(date) {
-  return date.toISOString().slice(0, 10);
+  if (date instanceof Date) date = date.toISOString();
+  return date.slice(0, 10);
 }
 
 /**
@@ -21,26 +22,56 @@ export function getHourFromISO(iso) {
 }
 
 /**
- * Clones a date and adds/subtracts a specific number of days.
+ * Get the year from an ISO 8601 string
  *
- * @param {Date} date The base date to shift
- * @param {number} days Number of days to add (positive) or subtract (negative)
- * @returns {Date} The shifted date
+ * @param {string} iso ISO 8601
+ * @returns {number} The year (YYYY)
  */
-export function shiftDays(date, days) {
-  const copy = new Date(date);
-  copy.setDate(copy.getDate() + days);
-  return copy;
+export function getYearFromISO(iso) {
+  return Number(iso.slice(0, 4));
+}
+
+/**
+ * Get the month from an ISO 8601 string
+ *
+ * @param {string} iso ISO 8601
+ * @returns {number} The month (1-12)
+ */
+export function getMonthFromISO(iso) {
+  return Number(iso.slice(5, 7));
+}
+
+/**
+ * Shifts a YYYY-MM-DD date string by a given number of days.
+ * Safe from timezone shifting and correctly accounts for month/year boundaries.
+ *
+ * @param {string | Date} dateStr YYYY-MM-DD
+ * @param {number} days The number of days to shift (can be positive or negative).
+ * @returns {string} YYYY-MM-DD
+ */
+export function shiftDays(dateStr, days) {
+  if (dateStr instanceof Date) dateStr = toDateStr(dateStr);
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+
+  date.setUTCDate(date.getUTCDate() + days);
+
+  const resY = date.getUTCFullYear();
+  const resM = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const resD = String(date.getUTCDate()).padStart(2, "0");
+
+  return `${resY}-${resM}-${resD}`;
 }
 
 /**
  * Shifts a date by a specific number of years.
  *
- * @param {string} dateStr YYYY-MM-DD
+ * @param {string | Date} dateStr YYYY-MM-DD
  * @param {number} years Number of years to shift
  * @returns {string} YYYY-MM-DD
  */
 export function shiftYears(dateStr, years) {
+  if (dateStr instanceof Date) dateStr = toDateStr(dateStr);
   const [y, m, d] = dateStr.split("-").map(Number);
   return `${y - years}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
@@ -48,15 +79,35 @@ export function shiftYears(dateStr, years) {
 /**
  * Returns the day of the year for a given date.
  *
- * @param {string} dateStr YYYY-MM-DD
+ * @param {string | Date} dateStr YYYY-MM-DD
  * @returns {number} Day of the year
  */
 export function dayOfYear(dateStr) {
+  if (dateStr instanceof Date) dateStr = toDateStr(dateStr);
   const [y, m, d] = dateStr.split("-").map(Number);
   const date = new Date(Date.UTC(y, m - 1, d));
 
   const start = Date.UTC(y, 0, 0);
   return Math.floor((date - start) / 86400000);
+}
+
+/**
+ * Clamps a date between a minimum and maximum date
+ *
+ * @param {string | Date} dateStr YYYY-MM-DD
+ * @param {string | Date} min YYYY-MM-DD, inclusive
+ * @param {string | Date} max YYYY-MM-DD, inclusive
+ * @returns {string} YYYY-MM-DD
+ */
+export function clampDate(dateStr, min, max) {
+  if (min instanceof Date) min = toDateStr(min);
+  if (max instanceof Date) max = toDateStr(max);
+  if (dateStr instanceof Date) dateStr = toDateStr(dateStr);
+
+  if (dateStr < min) return min;
+  if (dateStr > max) return max;
+
+  return dateStr;
 }
 
 /**

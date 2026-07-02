@@ -6,7 +6,7 @@ import {
   sigmaToSeverity,
 } from "./calculation.js";
 import { getSettings } from "../app/settings.js";
-import { CONDITIONS, HISTORICAL } from "../types.js";
+import { CONDITIONS, HISTORICAL, DAILY_CONDITIONS } from "../types.js";
 import { runAnalysisCurrent } from "./modes/current.js";
 import { runAnalysisPast } from "./modes/past.js";
 import { runAnalysisManual } from "./modes/manual.js";
@@ -44,11 +44,12 @@ export async function runAnalysis() {
      *   conditions: typeof CONDITIONS,
      *   stats: typeof HISTORICAL[],
      *   sigma: number,
-     *   sampleSize: number
+     *   sampleSize: number,
      *   basedOn: {
      *      mode: "temperature" | "apparentTemperature",
      *      comparison: "min" | "max" | "mean"
-     *   }
+     *   },
+     *   readings: typeof CONDITIONS[] | typeof DAILY_CONDITIONS[],
      * }}
      */
     let data = {

@@ -10,5 +10,7 @@ export async function fetchWithRetry(url, retries = 5) {
     await new Promise((r) => setTimeout(r, delay));
   }
 
-  throw new Error("Too many retries");
+  throw new Error(
+    "Failed to get data from Open-Meteo API due to rate limits, please try again later.",
+  );
 }
