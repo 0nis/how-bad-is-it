@@ -19,7 +19,11 @@ export const template = /* HTML */ `
         />
       </div>
       <div class="field">
-        <label for="comparison-type" class="label">Compare against ...</label>
+        <label for="season-picker" class="label">Season</label>
+        <dropdown-input id="season-picker"></dropdown-input>
+      </div>
+      <div class="field">
+        <label for="comparison-type" class="label">Compare against</label>
         <segmented-input id="comparison-type"></segmented-input>
       </div>
     </div>

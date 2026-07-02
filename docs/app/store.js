@@ -11,7 +11,8 @@ const state = {
     },
     manual: {
       temperature: null,
-      comparison: "max",
+      comparison: null,
+      season: null,
     },
   },
   status: "idle",

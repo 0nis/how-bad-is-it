@@ -12,7 +12,8 @@
  *    },
  *    manual: {
  *      temperature: number,
- *      comparison: "min" | "max"
+ *      comparison: "min" | "max",
+ *      season: "spring" | "summer" | "autumn" | "winter"
  *    }
  * }} options Mode options
  * @property {"idle" | "loading" | "success" | "error"} status Status of the analysis process

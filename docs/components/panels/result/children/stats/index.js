@@ -9,6 +9,9 @@ import { style } from "./style.js";
 import { template } from "./template.js";
 import { APPSTATE } from "../../../../../types.js";
 
+// TODO: make stats work for min/max readings
+// just make the whole thing dynamic pls
+
 class ResultStats extends HTMLElement {
   constructor() {
     super();

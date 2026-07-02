@@ -5,6 +5,7 @@ import { renderShadow } from "../../../../utils/shadow.js";
 import { pluralize } from "../../../../utils/string.js";
 import { fToC } from "../../../../utils/weather.js";
 import { modeSheet } from "../../style.js";
+import { flower, leaf, snowflake, sun } from "./icons.js";
 import { template } from "./template.js";
 
 // TODO: Add a seasonal selector? Maybe?
@@ -48,9 +49,12 @@ class ModeManualPanel extends HTMLElement {
     this.tempUnitEl = this.shadowRoot.querySelector("#unit");
     this.tempInputEl = this.shadowRoot.querySelector("#temp");
 
+    this.seasonPickerInputEl = this.shadowRoot.querySelector("#season-picker");
+
     this.startBtn = this.shadowRoot.querySelector("start-analysis-button");
 
     this.initInputs();
+    this.bindEvents();
     this.sync();
   }
 
@@ -59,19 +63,26 @@ class ModeManualPanel extends HTMLElement {
       { label: "Daily high", value: "max" },
       { label: "Daily low", value: "min" },
     ];
+    this.comparisonTypeInput.value = "max";
+
+    this.seasonPickerInputEl.options = [
+      { value: "spring", label: "Spring", icon: flower ?? "🌸" },
+      { value: "summer", label: "Summer", icon: sun ?? "☀️" },
+      { value: "autumn", label: "Autumn", icon: leaf ?? "🍂" },
+      { value: "winter", label: "Winter", icon: snowflake ?? "❄️" },
+    ];
+    this.seasonPickerInputEl.selected = "summer";
+  }
+
+  bindEvents() {
     this.comparisonTypeInput.addEventListener("change", () => {
       this.updateState();
-      this.checkIfReady();
     });
-
     this.tempInputEl.addEventListener("input", () => {
-      let newTemp;
-      if (getSettings().unitSystem === "imperial")
-        newTemp = fToC(this.tempInputEl.value);
-      else newTemp = this.tempInputEl.value;
-
       this.updateState();
-      this.checkIfReady();
+    });
+    this.seasonPickerInputEl.addEventListener("change", () => {
+      this.updateState();
     });
   }
 
@@ -88,9 +99,11 @@ class ModeManualPanel extends HTMLElement {
         manual: {
           temperature: temp,
           comparison: this.comparisonTypeInput.value,
+          season: this.seasonPickerInputEl.selected,
         },
       },
     });
+    this.checkIfReady();
   }
 
   checkIfReady() {
